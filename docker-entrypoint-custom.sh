@@ -58,6 +58,29 @@ else
     echo "Learning Hub plugin already installed."
 fi
 
+# Install WordPress Importer plugin
+if ! wp plugin is-installed wordpress-importer --allow-root --path=/var/www/html 2>/dev/null; then
+    echo "Installing WordPress Importer plugin..."
+    wp plugin install wordpress-importer --activate --allow-root --path=/var/www/html
+    echo "WordPress Importer plugin installed and activated!"
+else
+    echo "WordPress Importer plugin already installed."
+    # Ensure it's activated
+    if ! wp plugin is-active wordpress-importer --allow-root --path=/var/www/html 2>/dev/null; then
+        echo "Activating WordPress Importer plugin..."
+        wp plugin activate wordpress-importer --allow-root --path=/var/www/html
+    fi
+fi
+
+# Enable multisite if not already enabled
+if ! wp core is-installed --network --allow-root --path=/var/www/html 2>/dev/null; then
+    echo "Enabling WordPress multisite..."
+    wp core multisite-convert --allow-root --path=/var/www/html
+    echo "Multisite enabled!"
+else
+    echo "Multisite already enabled."
+fi
+
 echo "Setup complete! WordPress is ready."
 
 # Keep the WordPress process running
