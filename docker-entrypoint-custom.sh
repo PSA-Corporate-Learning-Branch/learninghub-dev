@@ -111,14 +111,35 @@ else
     echo "Multisite already enabled."
 fi
 
+# Modify WordPress core files to support port 8181 in multisite
+echo "Patching WordPress core files for port support..."
+
+# Patch wp-admin/includes/network.php to allow port 8181
+if [ -f /var/www/html/wp-admin/includes/network.php ]; then
+    sed -i "s/':443' ) ) )/':443', ':8181' ) ) )/g" /var/www/html/wp-admin/includes/network.php
+    echo "Patched network.php"
+fi
+
+# Patch wp-includes/ms-default-constants.php to fix cookie domain
+if [ -f /var/www/html/wp-includes/ms-default-constants.php ]; then
+    # Backup the original
+    cp /var/www/html/wp-includes/ms-default-constants.php /var/www/html/wp-includes/ms-default-constants.php.bak
+
+    # Find the line with COOKIE_DOMAIN and replace it
+    sed -i "s/define( 'COOKIE_DOMAIN', \$current_network->cookie_domain );/define( 'COOKIE_DOMAIN', '.' . preg_replace( '\/:[0-9]+$\/', '', \$current_network->cookie_domain ) );/g" /var/www/html/wp-includes/ms-default-constants.php
+    echo "Patched ms-default-constants.php for cookie domain"
+fi
+
 # Create mu-plugins directory and add multisite port fix
-echo "Adding multisite port fix filter..."
+echo "Creating multisite port fix mu-plugin..."
 mkdir -p /var/www/html/wp-content/mu-plugins
-cat > /var/www/html/wp-content/mu-plugins/multisite-port-fix.php << 'EOF'
+cat > /var/www/html/wp-content/mu-plugins/00-multisite-port-fix.php << 'EOF'
 <?php
 /**
  * Plugin Name: Multisite Port Fix
  * Description: Ensures custom ports are properly handled in multisite domains
+ * Version: 1.0
+ * Author: Auto-generated
  */
 
 // Fix port in domain normalization
@@ -131,26 +152,11 @@ add_filter( 'wp_normalize_site_data', function( $data ) {
     }
     return $data;
 }, 50, 1 );
-
-// Fix cookie domain to not include port
-add_filter( 'site_url', function( $url, $path, $scheme, $blog_id ) {
-    // Ensure URLs always have the port
-    if ( strpos( $url, 'localhost' ) !== false && strpos( $url, ':8181' ) === false ) {
-        $url = str_replace( 'localhost', 'localhost:8181', $url );
-    }
-    return $url;
-}, 10, 4 );
-
-add_filter( 'home_url', function( $url, $path, $orig_scheme, $blog_id ) {
-    // Ensure URLs always have the port
-    if ( strpos( $url, 'localhost' ) !== false && strpos( $url, ':8181' ) === false ) {
-        $url = str_replace( 'localhost', 'localhost:8181', $url );
-    }
-    return $url;
-}, 10, 4 );
 EOF
-chown www-data:www-data /var/www/html/wp-content/mu-plugins/multisite-port-fix.php
-echo "Multisite port fix filter added!"
+chown www-data:www-data /var/www/html/wp-content/mu-plugins/00-multisite-port-fix.php
+echo "Multisite port fix mu-plugin created!"
+
+echo "WordPress core patched for multisite port support!"
 
 # Configure main site title and theme
 echo "Configuring main site..."
