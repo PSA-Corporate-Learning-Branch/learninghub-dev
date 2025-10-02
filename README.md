@@ -12,9 +12,9 @@ Currently requires [Docker](https://www.docker.com/) installed on your system. I
 
 `docker compose up --build`
 
-- From here, you'll want to create the network site you're interested in developing upon here locally
-- Then go to the production version and download the XML export file. 
+- Navigate your web browser to `http://localhost:8181` to see your site. Login at the normal `\wp-admin` URL.
+- From here, you'll want to login and create the network site you're interested in developing upon.
+- Then go to the production version of that site and download its XML export file. 
 - Then go to the dashboard of your newly created network site and go to `Tools > WordPress Run Importer` and upload the XML you just downloaded
 - Voila! You should now have a fully operational localised WordPress platform to develop upon.
-- Navigate your web browser to `http://localhost:8181` to see your site.
 - Currently the WP user/pass is set as admin/admin 
