@@ -17,4 +17,8 @@ Currently requires [Docker](https://www.docker.com/) installed on your system. I
 - Then go to the production version of that site and download its XML export file. 
 - Then go to the dashboard of your newly created network site and go to `Tools > WordPress Run Importer` and upload the XML you just downloaded
 - Voila! You should now have a fully operational localised WordPress platform to develop upon.
-- Currently the WP user/pass is set as admin/admin 
+- Currently the WP user/pass is set as admin/admin
+
+## Contributing
+
+Before making changes, review [`AGENTS.md`](AGENTS.md) for project structure, coding standards, and pull request expectations.
