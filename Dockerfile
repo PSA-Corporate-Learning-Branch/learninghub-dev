@@ -10,6 +10,10 @@ RUN apt-get update && \
     apt-get install -y git unzip mariadb-client && \
     rm -rf /var/lib/apt/lists/*
 
+# Copy Apache configuration for subdirectory
+COPY apache-learninghub.conf /etc/apache2/conf-available/learninghub.conf
+RUN a2enconf learninghub
+
 # Copy entrypoint script
 COPY docker-entrypoint-custom.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint-custom.sh
